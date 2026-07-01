@@ -1,1 +1,1044 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>NiceHL 82-0</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #101820;
+      color: white;
+      margin: 0;
+      padding: 30px;
+    }
+
+    .container {
+      max-width: 1250px;
+      margin: 0 auto;
+    }
+
+    h1, h2, h3 {
+      margin-top: 0;
+    }
+
+    .panel {
+      background: #1d2a35;
+      border: 1px solid #314657;
+      border-radius: 14px;
+      padding: 22px;
+      margin-bottom: 20px;
+    }
+
+    button {
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+      margin-top: 6px;
+      margin-right: 8px;
+      font-size: 1rem;
+      cursor: pointer;
+      font-weight: bold;
+      background: #f4f4f4;
+      color: #111;
+    }
+
+    button:hover {
+      opacity: 0.85;
+    }
+
+    button:disabled {
+      cursor: not-allowed;
+      opacity: 0.45;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .draft-progress {
+      color: #c9d6df;
+      font-size: 0.95rem;
+      margin-bottom: 10px;
+    }
+
+    .spin-area {
+      margin-top: 18px;
+      padding: 18px;
+      background: #263746;
+      border: 1px solid #4b6578;
+      border-radius: 12px;
+    }
+
+    .spin-result {
+      margin-top: 14px;
+      font-size: 1.8rem;
+      font-weight: bold;
+      color: #ffffff;
+    }
+
+    .position-columns {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+      margin-top: 20px;
+    }
+
+    .position-column {
+      background: #263746;
+      border: 1px solid #4b6578;
+      border-radius: 12px;
+      padding: 14px;
+      min-height: 180px;
+    }
+
+    .position-column.locked {
+      opacity: 0.55;
+    }
+
+    .column-title {
+      font-size: 1.2rem;
+      font-weight: bold;
+      margin-bottom: 4px;
+    }
+
+    .column-count {
+      color: #c9d6df;
+      font-size: 0.9rem;
+      margin-bottom: 10px;
+    }
+
+    .player-card {
+      background: #1d2a35;
+      border: 1px solid #4b6578;
+      border-radius: 8px;
+      padding: 8px 10px;
+      margin-bottom: 7px;
+      cursor: pointer;
+      transition: 0.15s ease;
+      font-size: 0.9rem;
+    }
+
+    .player-card:hover {
+      background: #345066;
+      transform: translateY(-1px);
+    }
+
+    .player-row {
+      display: grid;
+      grid-template-columns: 1.35fr 1.9fr;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .player-name {
+      font-size: 0.95rem;
+      font-weight: bold;
+      margin-bottom: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .stats {
+      margin-top: 0;
+      font-size: 0.82rem;
+      line-height: 1.2;
+      text-align: right;
+      color: #dbe7ef;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .hockey-lineup {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 18px;
+      margin-top: 20px;
+    }
+
+    .line-row {
+      display: grid;
+      gap: 14px;
+      width: 100%;
+    }
+
+    .forward-row {
+      grid-template-columns: repeat(3, 1fr);
+      max-width: 900px;
+    }
+
+    .defence-row {
+      grid-template-columns: repeat(2, 1fr);
+      max-width: 600px;
+    }
+
+    .goalie-row {
+      grid-template-columns: 1fr;
+      max-width: 300px;
+    }
+
+    .lineup-card {
+      background: #263746;
+      border: 1px solid #4b6578;
+      border-radius: 12px;
+      padding: 16px;
+      text-align: center;
+    }
+
+    .lineup-position {
+      color: #c9d6df;
+      font-size: 0.85rem;
+      margin-bottom: 6px;
+    }
+
+    .lineup-player-name {
+      font-size: 1.15rem;
+      font-weight: bold;
+      margin-bottom: 12px;
+    }
+
+    .lineup-avg {
+      font-size: 2rem;
+      font-weight: bold;
+    }
+
+    .lineup-label {
+      color: #c9d6df;
+      font-size: 0.8rem;
+      margin-top: 4px;
+    }
+
+    .result {
+      font-size: 2.6rem;
+      font-weight: bold;
+      margin: 10px 0;
+    }
+
+    .error {
+      color: #ffb4b4;
+      font-weight: bold;
+    }
+
+    .success {
+      color: #b7ffb7;
+      font-weight: bold;
+    }
+
+    .muted {
+      color: #c9d6df;
+      font-size: 0.95rem;
+      margin-top: 10px;
+    }
+
+    .footer-buttons {
+      margin-top: 20px;
+    }
+
+    @media (max-width: 950px) {
+      .position-columns {
+        grid-template-columns: 1fr;
+      }
+
+      .forward-row,
+      .defence-row,
+      .goalie-row {
+        grid-template-columns: 1fr;
+        max-width: 100%;
+      }
+
+      body {
+        padding: 15px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1>NiceHL 82-0</h1>
+
+    <div class="panel" id="loadingPanel">
+      <h2>Loading NiceHL Data</h2>
+      <p>The league data is being loaded automatically.</p>
+      <p id="uploadMessage">Loading data...</p>
+      <button id="retryButton" class="hidden" onclick="loadFiles()">Try Again</button>
+    </div>
+
+    <div class="panel hidden" id="gamePanel">
+      <h2 id="roundTitle"></h2>
+      <p class="draft-progress" id="draftProgress"></p>
+      <p id="roundDescription"></p>
+
+      <div class="spin-area">
+        <button id="spinButton" onclick="spinYearAndTeam()">Spin Year + Team</button>
+        <button id="spinAgainButton" onclick="spinAgain()" class="hidden">Spin Again</button>
+        <div id="spinAgainText" class="muted"></div>
+        <div id="spinResult" class="spin-result"></div>
+      </div>
+
+      <div class="position-columns" id="positionColumns"></div>
+    </div>
+
+    <div class="panel hidden" id="lineupPanel">
+      <h2>Your Starting Lineup</h2>
+      <p class="muted">Average Fantasy Points are revealed after the draft.</p>
+
+      <div class="hockey-lineup">
+        <div class="line-row forward-row" id="forwardLine"></div>
+        <div class="line-row defence-row" id="defenceLine"></div>
+        <div class="line-row goalie-row" id="goalieLine"></div>
+      </div>
+    </div>
+
+    <div class="panel hidden" id="resultPanel">
+      <h2>Final Result</h2>
+
+      <div class="result" id="finalRecord"></div>
+
+      <h3 id="resultTitle"></h3>
+      <p id="resultMessage"></p>
+
+      <div class="footer-buttons">
+        <button onclick="restartGame()">Draft Again</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let allPlayers = {
+      F: [],
+      D: [],
+      G: []
+    };
+
+    let recordScale = [];
+    let lineup = [];
+    let currentSpin = null;
+    let spinAgainUsed = 0;
+
+    const maxSpinAgainUses = 2;
+
+    const rosterRequirements = {
+      F: 3,
+      D: 2,
+      G: 1
+    };
+
+    const totalPicks =
+      rosterRequirements.F +
+      rosterRequirements.D +
+      rosterRequirements.G;
+
+    const positionNames = {
+      F: "Forward",
+      D: "Defence",
+      G: "Goalie"
+    };
+
+    async function loadFiles() {
+      const message = document.getElementById("uploadMessage");
+      const retryButton = document.getElementById("retryButton");
+
+      message.className = "";
+      message.textContent = "Loading data...";
+
+      if (retryButton) {
+        retryButton.classList.add("hidden");
+      }
+
+      try {
+        const fText = await fetchCSV("data/F.csv");
+        const dText = await fetchCSV("data/D.csv");
+        const gText = await fetchCSV("data/G.csv");
+        const recordsText = await fetchCSV("data/Records.csv");
+
+        allPlayers.F = normalizePlayers(parseCSV(fText), "F");
+        allPlayers.D = normalizePlayers(parseCSV(dText), "D");
+        allPlayers.G = normalizePlayers(parseCSV(gText), "G");
+
+        assignPlayerIds();
+
+        recordScale = normalizeRecords(parseCSV(recordsText));
+
+        if (allPlayers.F.length < rosterRequirements.F) {
+          throw new Error("Not enough valid forwards found.");
+        }
+
+        if (allPlayers.D.length < rosterRequirements.D) {
+          throw new Error("Not enough valid defence players found.");
+        }
+
+        if (allPlayers.G.length < rosterRequirements.G) {
+          throw new Error("Not enough valid goalies found.");
+        }
+
+        if (recordScale.length === 0) {
+          throw new Error("No valid records found in Records.csv.");
+        }
+
+        message.className = "success";
+        message.textContent = "League data loaded.";
+
+        document.getElementById("loadingPanel").classList.add("hidden");
+        document.getElementById("gamePanel").classList.remove("hidden");
+        document.getElementById("lineupPanel").classList.add("hidden");
+        document.getElementById("resultPanel").classList.add("hidden");
+
+        startGame();
+      } catch (error) {
+        message.className = "error";
+        message.textContent = "Error: " + error.message;
+
+        if (retryButton) {
+          retryButton.classList.remove("hidden");
+        }
+      }
+    }
+
+    async function fetchCSV(path) {
+      const response = await fetch(path, {
+        cache: "no-cache"
+      });
+
+      if (!response.ok) {
+        throw new Error("Could not load " + path);
+      }
+
+      return await response.text();
+    }
+
+    function parseCSV(text) {
+      const rows = [];
+      let currentRow = [];
+      let currentValue = "";
+      let insideQuotes = false;
+
+      for (let i = 0; i < text.length; i++) {
+        const char = text[i];
+        const nextChar = text[i + 1];
+
+        if (char === '"' && insideQuotes && nextChar === '"') {
+          currentValue += '"';
+          i++;
+        } else if (char === '"') {
+          insideQuotes = !insideQuotes;
+        } else if (char === "," && !insideQuotes) {
+          currentRow.push(currentValue);
+          currentValue = "";
+        } else if ((char === "\n" || char === "\r") && !insideQuotes) {
+          if (currentValue.length > 0 || currentRow.length > 0) {
+            currentRow.push(currentValue);
+            rows.push(currentRow);
+            currentRow = [];
+            currentValue = "";
+          }
+
+          if (char === "\r" && nextChar === "\n") {
+            i++;
+          }
+        } else {
+          currentValue += char;
+        }
+      }
+
+      if (currentValue.length > 0 || currentRow.length > 0) {
+        currentRow.push(currentValue);
+        rows.push(currentRow);
+      }
+
+      if (rows.length === 0) {
+        return [];
+      }
+
+      const headers = rows[0].map(header => cleanHeader(header));
+
+      return rows.slice(1)
+        .filter(row => row.some(cell => String(cell).trim() !== ""))
+        .map(row => {
+          const item = {};
+
+          headers.forEach((header, index) => {
+            item[header] = row[index] ? row[index].trim() : "";
+          });
+
+          return item;
+        });
+    }
+
+    function cleanHeader(header) {
+      return String(header)
+        .replace(/^\uFEFF/, "")
+        .toLowerCase()
+        .replace(/\s+/g, "")
+        .replace(/[^a-z0-9]/g, "");
+    }
+
+    function normalizePlayers(rows, positionGroup) {
+      return rows.map(row => {
+        const player = {
+          positionGroup: positionGroup,
+
+          season: getValue(row, [
+            "season",
+            "year",
+            "yr"
+          ]),
+
+          fantasyTeam: getValue(row, [
+            "team",
+            "fantasyteam",
+            "fantasyclub",
+            "manager",
+            "owner",
+            "franchise",
+            "rosterteam"
+          ]),
+
+          playerName: getValue(row, [
+            "player",
+            "playername",
+            "name",
+            "goalie",
+            "skater"
+          ]),
+
+          avgPoints: toNumber(getValue(row, [
+            "avgpoints",
+            "averagepoints",
+            "avgfantasypoints",
+            "averagefantasypoints",
+            "avgfp",
+            "averagefp",
+            "fptsavg",
+            "fantasypointsaverage",
+            "fantasyavg",
+            "avg",
+            "average",
+            "fptspergame",
+            "pointspergame",
+            "ppg"
+          ])),
+
+          GP: getValue(row, ["gp", "gamesplayed"]),
+
+          G: getValue(row, ["g", "goals"]),
+          A: getValue(row, ["a", "assists"]),
+          BLK: getValue(row, ["blk", "blocks", "blockedshots"]),
+
+          W: getValue(row, ["w", "wins"]),
+          GA: getValue(row, ["ga", "goalsagainst"]),
+          SO: getValue(row, ["so", "shutouts"])
+        };
+
+        return player;
+      }).filter(player =>
+        player.playerName &&
+        player.season &&
+        player.fantasyTeam &&
+        !Number.isNaN(player.avgPoints)
+      );
+    }
+
+    function normalizeRecords(rows) {
+      return rows.map(row => {
+        const recordText = getValue(row, ["record", "finalrecord"]);
+        const parsedRecord = parseRecordText(recordText);
+
+        const winsFromColumn = toNumber(getValue(row, ["wins", "w"]));
+        const lossesFromColumn = toNumber(getValue(row, ["losses", "l"]));
+
+        const wins = !Number.isNaN(winsFromColumn)
+          ? winsFromColumn
+          : parsedRecord.wins;
+
+        const losses = !Number.isNaN(lossesFromColumn)
+          ? lossesFromColumn
+          : parsedRecord.losses;
+
+        return {
+          minScore: toNumber(getValue(row, [
+            "minscore",
+            "minimumscore",
+            "score",
+            "threshold"
+          ])),
+          wins: wins,
+          losses: losses,
+          title: getValue(row, ["title", "resulttitle"]),
+          message: getValue(row, ["message", "resultmessage", "description"])
+        };
+      })
+      .filter(record =>
+        !Number.isNaN(record.minScore) &&
+        !Number.isNaN(record.wins) &&
+        !Number.isNaN(record.losses)
+      )
+      .sort((a, b) => b.minScore - a.minScore);
+    }
+
+    function parseRecordText(recordText) {
+      const cleaned = String(recordText || "").trim();
+      const match = cleaned.match(/^(\d+)\s*[-–]\s*(\d+)$/);
+
+      if (!match) {
+        return {
+          wins: NaN,
+          losses: NaN
+        };
+      }
+
+      return {
+        wins: Number(match[1]),
+        losses: Number(match[2])
+      };
+    }
+
+    function getValue(row, possibleNames) {
+      for (const name of possibleNames) {
+        if (row[name] !== undefined) {
+          return row[name];
+        }
+      }
+
+      return "";
+    }
+
+    function toNumber(value) {
+      const cleaned = String(value)
+        .replace(/,/g, "")
+        .trim();
+
+      if (cleaned === "") {
+        return NaN;
+      }
+
+      return Number(cleaned);
+    }
+
+    function assignPlayerIds() {
+      let idCounter = 1;
+
+      ["F", "D", "G"].forEach(positionGroup => {
+        allPlayers[positionGroup].forEach(player => {
+          player.id = positionGroup + "-" + idCounter;
+          idCounter++;
+        });
+      });
+    }
+
+    function startGame() {
+      lineup = [];
+      currentSpin = null;
+      spinAgainUsed = 0;
+
+      document.getElementById("resultPanel").classList.add("hidden");
+      document.getElementById("lineupPanel").classList.add("hidden");
+      document.getElementById("gamePanel").classList.remove("hidden");
+
+      showRound();
+    }
+
+    function showRound() {
+      if (lineup.length >= totalPicks) {
+        finishDraft();
+        return;
+      }
+
+      currentSpin = null;
+
+      document.getElementById("roundTitle").textContent =
+        "Round " + (lineup.length + 1) + ": Spin Year + Team";
+
+      document.getElementById("draftProgress").textContent = getDraftProgressText();
+
+      document.getElementById("roundDescription").textContent =
+        "Spin first. Then choose one available player from the forwards, defence, or goalies box.";
+
+      document.getElementById("spinResult").textContent = "";
+      updateSpinAgainText();
+
+      const spinButton = document.getElementById("spinButton");
+      spinButton.disabled = false;
+      spinButton.textContent = "Spin Year + Team";
+
+      const spinAgainButton = document.getElementById("spinAgainButton");
+      spinAgainButton.classList.add("hidden");
+      spinAgainButton.disabled = false;
+
+      renderPositionColumns();
+    }
+
+    function getDraftProgressText() {
+      return (
+        "Drafted " + lineup.length + " of " + totalPicks +
+        " | F " + getDraftedCount("F") + "/" + rosterRequirements.F +
+        " | D " + getDraftedCount("D") + "/" + rosterRequirements.D +
+        " | G " + getDraftedCount("G") + "/" + rosterRequirements.G
+      );
+    }
+
+    function spinYearAndTeam() {
+      performSpin();
+    }
+
+    function spinAgain() {
+      if (!currentSpin) {
+        return;
+      }
+
+      if (spinAgainUsed >= maxSpinAgainUses) {
+        return;
+      }
+
+      spinAgainUsed++;
+      performSpin();
+    }
+
+    function performSpin() {
+      const availableCombos = getAvailableSeasonTeamCombos();
+
+      if (availableCombos.length === 0) {
+        document.getElementById("positionColumns").innerHTML =
+          "<p class='error'>No valid season and team combinations left.</p>";
+        return;
+      }
+
+      const possibleCombos = availableCombos.filter(combo => {
+        if (!currentSpin) {
+          return true;
+        }
+
+        return !(
+          normalizeKey(combo.season) === normalizeKey(currentSpin.season) &&
+          normalizeKey(combo.fantasyTeam) === normalizeKey(currentSpin.fantasyTeam)
+        );
+      });
+
+      const spinPool = possibleCombos.length > 0 ? possibleCombos : availableCombos;
+
+      currentSpin = spinPool[
+        Math.floor(Math.random() * spinPool.length)
+      ];
+
+      document.getElementById("spinResult").textContent =
+        currentSpin.season + " | " + currentSpin.fantasyTeam;
+
+      document.getElementById("roundDescription").textContent =
+        "Choose one player from this season and fantasy team.";
+
+      const spinButton = document.getElementById("spinButton");
+      spinButton.disabled = true;
+      spinButton.textContent = "Spun";
+
+      const spinAgainButton = document.getElementById("spinAgainButton");
+      spinAgainButton.classList.remove("hidden");
+      spinAgainButton.disabled = spinAgainUsed >= maxSpinAgainUses;
+
+      updateSpinAgainText();
+      renderPositionColumns();
+    }
+
+    function updateSpinAgainText() {
+      const remaining = maxSpinAgainUses - spinAgainUsed;
+
+      document.getElementById("spinAgainText").textContent =
+        "Spin Again uses remaining: " + remaining;
+    }
+
+    function getAvailableSeasonTeamCombos() {
+      const seen = new Set();
+      const combos = [];
+
+      ["F", "D", "G"].forEach(positionGroup => {
+        if (isPositionFull(positionGroup)) {
+          return;
+        }
+
+        allPlayers[positionGroup].forEach(player => {
+          if (isPlayerAlreadyDrafted(player)) {
+            return;
+          }
+
+          const comboKey =
+            normalizeKey(player.season) + "||" + normalizeKey(player.fantasyTeam);
+
+          if (!seen.has(comboKey)) {
+            seen.add(comboKey);
+
+            combos.push({
+              season: player.season,
+              fantasyTeam: player.fantasyTeam
+            });
+          }
+        });
+      });
+
+      return combos;
+    }
+
+    function renderPositionColumns() {
+      const container = document.getElementById("positionColumns");
+      container.innerHTML = "";
+
+      ["F", "D", "G"].forEach(positionGroup => {
+        const draftedCount = getDraftedCount(positionGroup);
+        const requiredCount = rosterRequirements[positionGroup];
+        const isFull = isPositionFull(positionGroup);
+
+        const column = document.createElement("div");
+        column.className = "position-column" + (isFull ? " locked" : "");
+
+        const title = document.createElement("div");
+        title.className = "column-title";
+        title.textContent = positionNames[positionGroup];
+
+        const count = document.createElement("div");
+        count.className = "column-count";
+        count.textContent = draftedCount + "/" + requiredCount + " filled";
+
+        column.appendChild(title);
+        column.appendChild(count);
+
+        if (isFull) {
+          const muted = document.createElement("p");
+          muted.className = "muted";
+          muted.textContent = "Position filled.";
+          column.appendChild(muted);
+        } else if (!currentSpin) {
+          const muted = document.createElement("p");
+          muted.className = "muted";
+          muted.textContent = "Spin to reveal available players.";
+          column.appendChild(muted);
+        } else {
+          const matchingPlayers = getMatchingPlayers(positionGroup);
+
+          if (matchingPlayers.length === 0) {
+            const muted = document.createElement("p");
+            muted.className = "muted";
+            muted.textContent = "No available players for this position.";
+            column.appendChild(muted);
+          } else {
+            matchingPlayers.forEach(player => {
+              const card = document.createElement("div");
+              card.className = "player-card";
+              card.onclick = () => draftPlayer(player);
+
+              const row = document.createElement("div");
+              row.className = "player-row";
+
+              const name = document.createElement("div");
+              name.className = "player-name";
+              name.textContent = player.playerName;
+              name.title = player.playerName;
+
+              const stats = document.createElement("div");
+              stats.className = "stats";
+              stats.innerHTML = getCompactStats(player);
+
+              row.appendChild(name);
+              row.appendChild(stats);
+              card.appendChild(row);
+              column.appendChild(card);
+            });
+          }
+        }
+
+        container.appendChild(column);
+      });
+    }
+
+    function getMatchingPlayers(positionGroup) {
+      if (!currentSpin) {
+        return [];
+      }
+
+      return allPlayers[positionGroup]
+        .filter(player =>
+          normalizeKey(player.season) === normalizeKey(currentSpin.season) &&
+          normalizeKey(player.fantasyTeam) === normalizeKey(currentSpin.fantasyTeam) &&
+          !isPlayerAlreadyDrafted(player)
+        )
+        .sort((a, b) => {
+          return getDisplaySortValue(b) - getDisplaySortValue(a);
+        });
+    }
+
+    function getDisplaySortValue(player) {
+      if (player.positionGroup === "G") {
+        const wins = toNumber(player.W);
+        const shutouts = toNumber(player.SO);
+        const goalsAgainst = toNumber(player.GA);
+
+        const safeWins = Number.isNaN(wins) ? 0 : wins;
+        const safeShutouts = Number.isNaN(shutouts) ? 0 : shutouts;
+        const safeGoalsAgainst = Number.isNaN(goalsAgainst) ? 999 : goalsAgainst;
+
+        return (safeWins * 100) + (safeShutouts * 10) - safeGoalsAgainst;
+      }
+
+      const goals = toNumber(player.G);
+      const assists = toNumber(player.A);
+
+      const safeGoals = Number.isNaN(goals) ? 0 : goals;
+      const safeAssists = Number.isNaN(assists) ? 0 : assists;
+
+      return safeGoals + safeAssists;
+    }
+
+    function draftPlayer(player) {
+      if (isPositionFull(player.positionGroup)) {
+        return;
+      }
+
+      if (isPlayerAlreadyDrafted(player)) {
+        return;
+      }
+
+      lineup.push(player);
+
+      showRound();
+    }
+
+    function isPositionFull(positionGroup) {
+      return getDraftedCount(positionGroup) >= rosterRequirements[positionGroup];
+    }
+
+    function getDraftedCount(positionGroup) {
+      return lineup.filter(player => player.positionGroup === positionGroup).length;
+    }
+
+    function isPlayerAlreadyDrafted(player) {
+      return lineup.some(drafted =>
+        normalizeKey(drafted.playerName) === normalizeKey(player.playerName)
+      );
+    }
+
+    function normalizeKey(value) {
+      return String(value || "")
+        .trim()
+        .toLowerCase()
+        .replace(/\s+/g, " ");
+    }
+
+    function getCompactStats(player) {
+      if (player.positionGroup === "G") {
+        return `
+          GP ${escapeHTML(player.GP || "0")} |
+          W ${escapeHTML(player.W || "0")} |
+          GA ${escapeHTML(player.GA || "0")} |
+          SO ${escapeHTML(player.SO || "0")}
+        `;
+      }
+
+      return `
+        GP ${escapeHTML(player.GP || "0")} |
+        G ${escapeHTML(player.G || "0")} |
+        A ${escapeHTML(player.A || "0")} |
+        BLK ${escapeHTML(player.BLK || "0")}
+      `;
+    }
+
+    function finishDraft() {
+      document.getElementById("gamePanel").classList.add("hidden");
+      document.getElementById("lineupPanel").classList.remove("hidden");
+      document.getElementById("resultPanel").classList.remove("hidden");
+
+      renderFinalLineup();
+
+      const lineupScore = lineup.reduce((total, player) => {
+        return total + player.avgPoints;
+      }, 0);
+
+      const record = getRecordFromScale(lineupScore);
+
+      document.getElementById("finalRecord").textContent =
+        record.wins + "-" + record.losses;
+
+      document.getElementById("resultTitle").textContent =
+        record.title || getDefaultTitle(record.wins);
+
+      document.getElementById("resultMessage").textContent =
+        record.message || "Final record calculated from the hidden average fantasy point score.";
+    }
+
+    function renderFinalLineup() {
+      const forwards = getPlayersByPosition("F");
+      const defence = getPlayersByPosition("D");
+      const goalies = getPlayersByPosition("G");
+
+      document.getElementById("forwardLine").innerHTML =
+        forwards.map((player, index) => makeLineupCard(player, "F" + (index + 1))).join("");
+
+      document.getElementById("defenceLine").innerHTML =
+        defence.map((player, index) => makeLineupCard(player, "D" + (index + 1))).join("");
+
+      document.getElementById("goalieLine").innerHTML =
+        goalies.map((player, index) => makeLineupCard(player, "G" + (index + 1))).join("");
+    }
+
+    function getPlayersByPosition(positionGroup) {
+      return lineup.filter(player => player.positionGroup === positionGroup);
+    }
+
+    function makeLineupCard(player, slotLabel) {
+      return `
+        <div class="lineup-card">
+          <div class="lineup-position">${escapeHTML(slotLabel)}</div>
+          <div class="lineup-player-name">${escapeHTML(player.playerName)}</div>
+          <div class="lineup-avg">${formatAvgPoints(player.avgPoints)}</div>
+          <div class="lineup-label">${escapeHTML(player.fantasyTeam)} | ${escapeHTML(player.season)}</div>
+        </div>
+      `;
+    }
+
+    function formatAvgPoints(value) {
+      const number = Number(value);
+
+      if (Number.isNaN(number)) {
+        return "0.00";
+      }
+
+      return number.toFixed(2);
+    }
+
+    function getRecordFromScale(lineupScore) {
+      for (const record of recordScale) {
+        if (lineupScore >= record.minScore) {
+          return record;
+        }
+      }
+
+      return recordScale[recordScale.length - 1];
+    }
+
+    function getDefaultTitle(wins) {
+      if (wins === 82) return "82-0. Perfect Season.";
+      if (wins >= 76) return "Absolute Wagon";
+      if (wins >= 68) return "Cup Favourite";
+      if (wins >= 58) return "Strong Contender";
+      if (wins >= 46) return "Respectable";
+      if (wins >= 35) return "Deeply Mid";
+      return "Rebuild Immediately";
+    }
+
+    function restartGame() {
+      startGame();
+    }
+
+    function escapeHTML(value) {
+      return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    window.addEventListener("DOMContentLoaded", loadFiles);
+  </script>
+</body>
+</html>
